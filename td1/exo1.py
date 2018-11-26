@@ -13,6 +13,6 @@ for doc in coll:
     #pprint.pprint(doc)
     #print(doc['age'])
     valeur += doc['age']
-    coll2.insert_one(doc)
+    #coll2.insert_one(doc)
 
 print('Moyenne age :', valeur/coll.count(True))
