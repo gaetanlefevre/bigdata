@@ -1,6 +1,6 @@
 import random
 
-motCible = 'Hello World'
+motCible = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 
 def get_distance(mot1, mot2):
     asciiMot1 = [ord(x) for x in list(mot1)]
@@ -17,14 +17,14 @@ def get_best(liste, cible):
         if distanceMin > get_distance(mot, cible):
             distanceMin = get_distance(mot, cible)
             valeurDistance = mot
-    return valeurDistance
+    return (valeurDistance, distanceMin)
 
 def init_generation(nbre_indiv, long_mot):
     population = []
     for i in range(nbre_indiv):
         individu = []
         for y in range(long_mot):
-            individu.append(random.randint(65,122))
+            individu.append(random.randint(0,255))
         population.append(''.join(chr(w) for w in individu))
     return population
 
@@ -47,38 +47,39 @@ def mutate(mot_apres_croisement):
     else:
         return mot_apres_croisement
 
+def croisement(mot1 ,mot2):
+    idx = random.randint(0 , len(mot1)-1)
+    out = ""
+    for i in range(len(mot1)):
+        if (i >= idx):
+            out+=mot2[i]
+        else:
+            out+=mot1[i]
+    return out
+
 def new_generation(liste_mots, meilleur_mot):
-    lettres = ''.join(liste_mots)
-    lettres+=meilleur_mot
-    myList = []
-    for char in lettres:
-        myList.append(char)
-    nouvelleGeneration = []
+    nouvelleGeneration = [meilleur_mot]
+    indexBestWord = liste_mots.index(meilleur_mot)
     for i in range(len(liste_mots)):
-        nouvelIndividu = ''
-        for y in range(len(liste_mots[0])):
-            nouvelIndividu+=random.choice(myList)
-        nouvelIndividu = mutate(nouvelIndividu)
-        nouvelleGeneration.append(nouvelIndividu)
+        if (i != indexBestWord):
+            nouvelIndividu = croisement(liste_mots[i], liste_mots[random.randint(0, len(liste_mots) - 1)])
+            nouvelIndividu = mutate(nouvelIndividu)
+            nouvelleGeneration.append(nouvelIndividu)
     return nouvelleGeneration
 
 def init_new_generation(liste_mots, meilleur_mot):
-    lettres = ''.join(liste_mots)
-    lettres+=meilleur_mot
-    myList = []
-    for char in lettres:
-        myList.append(char)
-    nouvelleGeneration = []
+    nouvelleGeneration = [meilleur_mot]
     for i in range(len(liste_mots)):
-        nouvelIndividu = ''
-        for y in range(len(liste_mots[0])):
-            nouvelIndividu+=random.choice(myList)
+        nouvelIndividu = croisement(liste_mots[i], liste_mots[random.randint(0, len(liste_mots) - 1)])
+        nouvelIndividu = mutate(nouvelIndividu)
         nouvelleGeneration.append(nouvelIndividu)
-    for i in range(200):
-        nouvelleGeneration = new_generation(nouvelleGeneration, get_best(nouvelleGeneration, motCible))
-        print(get_best(nouvelleGeneration, motCible), get_distance(get_best(nouvelleGeneration, motCible), motCible))
+    result_get_best = get_best(nouvelleGeneration, motCible)
+    while(result_get_best[1] > 0):
+        nouvelleGeneration = new_generation(nouvelleGeneration, result_get_best[0])
+        print(result_get_best[0], get_distance(result_get_best[0], motCible))
+        result_get_best = get_best(nouvelleGeneration, motCible)
     return nouvelleGeneration
 
-
-randGeneration = init_generation(5, 11)
-print init_new_generation(randGeneration, get_best(randGeneration, motCible))
+randGeneration = init_generation(5, len(motCible))
+result_get_best1 = get_best(randGeneration, motCible)
+print init_new_generation(randGeneration, result_get_best1[0])
